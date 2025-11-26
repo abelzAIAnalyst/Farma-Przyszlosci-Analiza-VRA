@@ -1,5 +1,7 @@
 # 🚜 Farma Przyszłości: Analiza opłacalności technologii VRA
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/abelzAIAnalyst/Farma-Przyszlosci-Analiza-VRA/blob/main/Symulator_Farmy_VRA.ipynb)
+
 ## 🎯 Cel Projektu
 Projekt ma na celu zbadanie potencjału ekonomicznego wdrożenia technologii **Rolnictwa Precyzyjnego (VRA)** w gospodarstwie o powierzchni 50 ha. Analiza opiera się na rzeczywistych danych satelitarnych oraz symulacji *in silico* w języku Python.
 
