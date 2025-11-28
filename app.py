@@ -1,80 +1,95 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 # --- KONFIGURACJA STRONY ---
-st.set_page_config(page_title="Farma Przyszłości", page_icon="🚜")
+st.set_page_config(page_title="Kalkulator VRA - Kaczynos", layout="wide")
 
 # --- TYTUŁ I WSTĘP ---
-st.title("🚜 Symulator Farmy Przyszłości")
+st.title("🌾 Farma Przyszłości: Kalkulator Oszczędności VRA")
 st.markdown("""
-To narzędzie demonstruje potencjał **Rolnictwa Precyzyjnego (VRA)**.
-Zmień parametry rynkowe po lewej stronie i zobacz, jak technologia wpływa na zysk gospodarstwa.
+To narzędzie demonstruje potencjał ekonomiczny rolnictwa precyzyjnego. 
+Porównujemy tradycyjne nawożenie (stała dawka) z metodą zmiennego dawkowania (VRA) 
+opartą na mapach satelitarnych Sentinel-2.
 """)
 
-# --- PASEK BOCZNY ---
-st.sidebar.header("⚙️ Parametry Rynku")
-cena_pszenicy = st.sidebar.slider("Cena Pszenicy (zł/t)", 600, 1500, 900, 50)
-cena_nawozu = st.sidebar.slider("Cena Azotu (zł/kg N)", 2.0, 12.0, 5.0, 0.5)
-areal = st.sidebar.number_input("Powierzchnia Gospodarstwa (ha)", 10, 1000, 50)
+# --- PASEK BOCZNY (INPUTY) ---
+st.sidebar.header("⚙️ Parametry Gospodarstwa")
+
+# Domyślne wartości z naszego Case Study
+area_input = st.sidebar.number_input("Powierzchnia pola (ha)", value=38.85, step=0.1)
+price_fert = st.sidebar.number_input("Cena nawozu (Saletra 34%) [zł/t]", value=1600, step=50)
+price_wheat = st.sidebar.number_input("Cena pszenicy [zł/t]", value=900, step=50)
 
 st.sidebar.markdown("---")
-st.sidebar.info("Symulacja oparta na danych satelitarnych Sentinel-2 (NDVI).")
+st.sidebar.header("🧪 Parametry Agronomiczne")
 
-# --- LOGIKA BIZNESOWA ---
-np.random.seed(42)
-ndvi_data = np.clip(np.random.normal(0.78, 0.05, 10000), 0.1, 0.95)
-df = pd.DataFrame({'NDVI': ndvi_data})
+# Zaawansowane ustawienia (można zwinąć/rozwinąć)
+with st.sidebar.expander("Edytuj dawki azotu (kg N/ha)"):
+    dose_trad = st.number_input("Metoda Tradycyjna (Stała)", value=180)
+    dose_vra_strong = st.number_input("VRA - Strefa Mocna (60% pola)", value=190)
+    dose_vra_weak = st.number_input("VRA - Strefa Słaba (30% pola)", value=130)
+    dose_vra_zero = st.number_input("VRA - Strefa Zerowa (10% pola)", value=0)
 
-def oblicz_plon(ndvi, dawka_azotu):
-    potencjal = ndvi * 12
-    if dawka_azotu <= 190:
-        wsp = min(dawka_azotu / 160, 1.0)
-    else:
-        nadmiar = dawka_azotu - 190
-        wsp = 1.0 - (nadmiar * 0.001)
-    return max(potencjal * wsp + np.random.normal(0, 0.2), 0)
+# --- OBLICZENIA (SILNIK) ---
+# Cena za kg czystego składnika N
+n_content = 0.34
+price_n_kg = price_fert / 1000 / n_content
 
-df['N_Tradycyjny'] = 220
-df['Plon_Tradycyjny'] = df.apply(lambda x: oblicz_plon(x['NDVI'], 220), axis=1)
+# Koszty - Tradycyjny
+cost_total_trad = dose_trad * price_n_kg * area_input
 
-def dobierz_dawke(ndvi):
-    if ndvi < 0.70: return 140
-    elif ndvi > 0.82: return 170
-    else: return 160
+# Koszty - VRA (Strefy: 60% / 30% / 10%)
+share_strong = 0.60
+share_weak = 0.30
+share_zero = 0.10
 
-df['N_Precyzyjny'] = df['NDVI'].apply(dobierz_dawke)
-df['Plon_Precyzyjny'] = df.apply(lambda x: oblicz_plon(x['NDVI'], x['N_Precyzyjny']), axis=1)
+avg_cost_ha_vra = (dose_vra_strong * price_n_kg * share_strong) + \
+                  (dose_vra_weak * price_n_kg * share_weak) + \
+                  (dose_vra_zero * price_n_kg * share_zero)
 
-zysk_A = (df['Plon_Tradycyjny'] * cena_pszenicy) - (df['N_Tradycyjny'] * cena_nawozu)
-zysk_B = (df['Plon_Precyzyjny'] * cena_pszenicy) - (df['N_Precyzyjny'] * cena_nawozu)
+cost_total_vra = avg_cost_ha_vra * area_input
 
-srednia_A = zysk_A.mean()
-srednia_B = zysk_B.mean()
-roznica = srednia_B - srednia_A
-zysk_total = roznica * areal
+# Oszczędność
+savings = cost_total_trad - cost_total_vra
+savings_per_ha = savings / area_input
 
-# --- WYNIKI ---
+# --- WIZUALIZACJA (DASHBOARD) ---
+
+# Kolumny z wynikami (Metrics)
 col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric(label="Zysk Tradycyjny (ha)", value=f"{srednia_A:.0f} zł")
-with col2:
-    st.metric(label="Zysk Precyzyjny (ha)", value=f"{srednia_B:.0f} zł", delta=f"+{roznica:.0f} zł")
-with col3:
-    st.metric(label=f"Ekstra Zysk ({areal} ha)", value=f"{zysk_total:,.0f} zł", delta="Do kieszeni")
+col1.metric("Koszt Tradycyjny", f"{cost_total_trad:,.0f} zł".replace(",", " "))
+col2.metric("Koszt VRA (Precyzyjny)", f"{cost_total_vra:,.0f} zł".replace(",", " "))
+col3.metric("Twoja Oszczędność", f"{savings:,.0f} zł".replace(",", " "), delta="Zyskujesz")
 
-st.subheader("📊 Porównanie Rentowności")
-fig, ax = plt.subplots(figsize=(8, 4))
-bars = ax.bar(['Tradycyjna', 'VRA (Precyzyjna)'], [srednia_A, srednia_B], color=['#ff4b4b', '#09ab3b'])
-ax.axhline(0, color='black', linewidth=0.8)
-ax.set_ylabel("Zysk (zł/ha)")
-if max(srednia_A, srednia_B) > 0:
-    ax.set_ylim(0, max(srednia_A, srednia_B)*1.2)
+st.markdown("---")
+
+# Wykres (Matplotlib wewnątrz Streamlit)
+fig, ax = plt.subplots(figsize=(10, 5))
+labels = ['Metoda Tradycyjna', 'Metoda VRA']
+costs = [cost_total_trad, cost_total_vra]
+colors = ['#d62728', '#2ca02c']
+
+bars = ax.bar(labels, costs, color=colors, width=0.5)
+
+# Etykiety nad słupkami
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width()/2., height + (height*0.05),
+             f'{height:,.0f} zł'.replace(',', ' '),
+             ha='center', va='bottom', fontsize=12, fontweight='bold')
+
+ax.set_ylabel('Koszt całkowity (PLN)')
+ax.set_title(f'Symulacja kosztów dla powierzchni {area_input} ha')
+ax.set_ylim(0, max(costs) * 1.2)
 ax.grid(axis='y', linestyle='--', alpha=0.5)
 
-for bar in bars:
-    yval = bar.get_height()
-    ax.text(bar.get_x() + bar.get_width()/2, yval + 100, f'{yval:.0f} zł', ha='center', weight='bold')
-
+# Renderowanie wykresu
 st.pyplot(fig)
+
+# --- WNIOSKI MARKETINGOWE ---
+st.success(f"""
+**Wniosek Biznesowy:**
+Dzięki zastosowaniu technologii satelitarnej, na samym nawożeniu azotowym oszczędzasz **{savings_per_ha:.0f} zł na każdym hektarze**.
+Dla Twojego gospodarstwa to kwota **{savings:,.0f} zł**, która zostaje w kieszeni przed żniwami.
+""")
