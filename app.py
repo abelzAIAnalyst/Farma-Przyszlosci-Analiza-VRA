@@ -88,8 +88,14 @@ ax.grid(axis='y', linestyle='--', alpha=0.5)
 st.pyplot(fig)
 
 # --- WNIOSKI MARKETINGOWE ---
+# --- PRZELICZNIK NA ZBOŻE (ŻEBY SUWAK CENY PSZENICY MIAŁ SENS) ---
+saved_wheat_tons = savings / price_wheat
+
+# --- WNIOSKI MARKETINGOWE ---
 st.success(f"""
 **Wniosek Biznesowy:**
 Dzięki zastosowaniu technologii satelitarnej, na samym nawożeniu azotowym oszczędzasz **{savings_per_ha:.0f} zł na każdym hektarze**.
-Dla Twojego gospodarstwa to kwota **{savings:,.0f} zł**, która zostaje w kieszeni przed żniwami.
+
+💰 Całkowita oszczędność w kieszeni: **{savings:,.0f} zł**
+🌾 To równowartość **{saved_wheat_tons:.2f} ton pszenicy**, której nie musisz sprzedawać, żeby pokryć koszty!
 """)
