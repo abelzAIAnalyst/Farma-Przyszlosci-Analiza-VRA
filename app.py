@@ -68,7 +68,7 @@ st.markdown("---")
 fig, ax = plt.subplots(figsize=(10, 5))
 labels = ['Metoda Tradycyjna', 'Metoda VRA']
 costs = [cost_total_trad, cost_total_vra]
-colors = ['gold', '#2ca02c']
+colors = ['#0000FF', '#2ca02c']
 
 bars = ax.bar(labels, costs, color=colors, width=0.5)
 
