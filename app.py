@@ -69,7 +69,7 @@ st.markdown("---")
 fig, ax = plt.subplots(figsize=(10, 5))
 labels = ['Metoda Tradycyjna', 'Metoda VRA']
 costs = [cost_total_trad, cost_total_vra]
-colors = ['#0000FF', '#2ca02c']
+colors = ["#FF0000", '#2ca02c']
 
 bars = ax.bar(labels, costs, color=colors, width=0.5)
 
@@ -96,7 +96,7 @@ saved_wheat_tons = savings / price_wheat
 st.success(f"""
 **Wniosek Biznesowy:**
 Dzięki zastosowaniu technologii satelitarnej, na samym nawożeniu azotowym oszczędzasz **{savings_per_ha:.0f} zł na każdym hektarze**.
-st.write(f"Moja prowizja: {my_commission:.2f} zł")
+st.write
 
 💰 Całkowita oszczędność w kieszeni: **{savings:,.0f} zł**
 🌾 To równowartość **{saved_wheat_tons:.2f} ton pszenicy**, której nie musisz sprzedawać, żeby pokryć koszty!
