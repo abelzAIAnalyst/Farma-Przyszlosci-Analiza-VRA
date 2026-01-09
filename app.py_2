@@ -116,3 +116,31 @@ Podsumowanie finansowe:
 * 🌾 Ekwiwalent w pszenicy: **{saved_wheat_tons:.2f} ton**
 """)
 
+st.header("🚜 Symulacja Skanowania Pola (Pętla for)")
+
+# To jest nasza mapa (lista wartości NDVI z 5 punktów)
+ndvi_samples = [0.15, 0.72, 0.45, 0.88, 0.21]
+
+# Puste listy, do których będziemy wrzucać wyniki (jak sortowanie ziemniaków)
+healthy_plants = []
+weak_plants = []
+
+st.write(f"Analizowane próbki NDVI: {ndvi_samples}")
+
+# --- START PĘTLI ---
+# "Dla każdego piksela (pixel) w liście (ndvi_samples):"
+for pixel in ndvi_samples:
+    
+    # Tu sprawdzamy kondycję (nasz if/else z poprzedniej lekcji)
+    if pixel > 0.5:
+        # Jeśli zdrowy (>0.5), wrzuć do koszyka "healthy"
+        healthy_plants.append(pixel)
+    else:
+        # Jeśli słaby, wrzuć do koszyka "weak"
+        weak_plants.append(pixel)
+
+# --- KONIEC PĘTLI ---
+
+# Wyświetlamy wyniki po sortowaniu
+st.success(f"Znaleziono {len(healthy_plants)} zdrowych punktów: {healthy_plants}")
+st.error(f"Znaleziono {len(weak_plants)} słabych punktów: {weak_plants}")
