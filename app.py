@@ -96,7 +96,7 @@ saved_wheat_tons = savings / price_wheat
 st.success(f"""
 **Wniosek Biznesowy:**
 Dzięki zastosowaniu technologii satelitarnej, na samym nawożeniu azotowym oszczędzasz **{savings_per_ha:.0f} zł na każdym hektarze**.
-st.write
+
 
 💰 Całkowita oszczędność w kieszeni: **{savings:,.0f} zł**
 🌾 To równowartość **{saved_wheat_tons:.2f} ton pszenicy**, której nie musisz sprzedawać, żeby pokryć koszty!
