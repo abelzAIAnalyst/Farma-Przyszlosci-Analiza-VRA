@@ -144,3 +144,28 @@ for pixel in ndvi_samples:
 # Wyświetlamy wyniki po sortowaniu
 st.success(f"Znaleziono {len(healthy_plants)} zdrowych punktów: {healthy_plants}")
 st.error(f"Znaleziono {len(weak_plants)} słabych punktów: {weak_plants}")
+
+st.markdown("---")
+st.header("🛰️ Generowanie Mapy Satelitarnej (NumPy)")
+
+# 1. Tworzymy "Macierz" (Grid) - symulacja pola 10x10 metrów
+# np.random.uniform(od, do, wymiary) - losuje liczby jak rzut kostką
+field_map = np.random.uniform(0.0, 1.0, (10, 10))
+
+st.write("Tak komputer widzi Twoją mapę (surowe dane):")
+st.write(field_map)
+
+# 2. Wizualizacja (Jak to widzi człowiek)
+st.write("A tak widzi to agronom (Heatmapa):")
+
+fig, ax = plt.subplots()
+# imshow = Image Show (Pokaż obrazek)
+# cmap='RdYlGn' = Red-Yellow-Green (Czerwony-Żółty-Zielony, klasyk NDVI)
+heatmap = ax.imshow(field_map, cmap='RdYlGn', vmin=0, vmax=1)
+
+# Dodajemy legendę (pasek kolorów)
+plt.colorbar(heatmap)
+ax.set_title("Symulacja NDVI (Losowe dane)")
+
+# Wyświetlamy w Streamlit
+st.pyplot(fig)
