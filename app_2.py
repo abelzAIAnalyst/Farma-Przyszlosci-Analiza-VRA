@@ -169,3 +169,32 @@ ax.set_title("Symulacja NDVI (Losowe dane)")
 
 # Wyświetlamy w Streamlit
 st.pyplot(fig)
+
+st.subheader("📉 Analiza Stref Problemowych (Maskowanie)")
+
+# 1. Definiujemy próg (Co uważamy za słabe zboże?)
+threshold = 0.4
+
+# 2. MASKOWANIE (To jest ta magia NumPy)
+# Pytamy: "Które piksele są mniejsze od 0.4?"
+# Python tworzy nową mapę złożoną tylko z Prawdy (True) i Fałszu (False)
+weak_zone_mask = field_map < threshold
+
+st.write(f"Maska logiczna (Gdzie jest problem?):")
+st.write(weak_zone_mask) # Zobaczysz tabelę z "True" i "False"
+
+# 3. Obliczenia na masce
+# W Pythonie True = 1, a False = 0.
+# Więc jak zsumujemy maskę, dowiemy się, ile jest "złych" pikseli.
+bad_pixels_count = np.sum(weak_zone_mask)
+total_area = field_map.size # Liczba wszystkich pikseli (100)
+bad_percentage = (bad_pixels_count / total_area) * 100
+
+st.error(f"⚠️ Alarm! {bad_percentage:.1f}% pola wymaga interwencji ({bad_pixels_count} sektorów).")
+
+# 4. Wizualizacja samej strefy problemowej
+fig2, ax2 = plt.subplots()
+# Wyświetlamy maskę. cmap='Greys_r' znaczy: Odwrócona szarość (Czarne to problem)
+ax2.imshow(weak_zone_mask, cmap='Greys')
+ax2.set_title(f"Mapa Aplikacyjna: Tylko strefy < {threshold}")
+st.pyplot(fig2)
