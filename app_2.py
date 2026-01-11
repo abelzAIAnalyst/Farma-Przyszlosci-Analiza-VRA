@@ -149,9 +149,19 @@ st.markdown("---")
 st.header("🛰️ Generowanie Mapy Satelitarnej (NumPy)")
 
 # 1. Tworzymy "Macierz" (Grid) - symulacja pola 10x10 metrów
-# np.random.uniform(od, do, wymiary) - losuje liczby jak rzut kostką
-field_map = np.random.uniform(0.0, 1.0, (10, 10))
+# --- ZAPAMIĘTYWANIE MAPY (Session State) ---
+# Sprawdzamy, czy w "schowku" (session_state) jest już mapa o nazwie 'my_field'
+if 'my_field' not in st.session_state:
+    # Jeśli nie ma, to losujemy RAZ i zapisujemy do schowka
+    st.session_state['my_field'] = np.random.uniform(0.0, 1.0, (10, 10))
 
+# Teraz wyciągamy mapę ze schowka do naszej zmiennej
+field_map = st.session_state['my_field']
+
+# Dodatkowy przycisk, żeby wymusić zmianę pola (gdybyśmy chcieli)
+if st.button("🔄 Wylosuj nowe pole"):
+    st.session_state['my_field'] = np.random.uniform(0.0, 1.0, (10, 10))
+    st.rerun() # Odśwież stronę natychmiast
 st.write("Tak komputer widzi Twoją mapę (surowe dane):")
 st.write(field_map)
 
