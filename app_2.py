@@ -149,21 +149,35 @@ st.markdown("---")
 st.header("🛰️ Generowanie Mapy Satelitarnej (NumPy)")
 
 # 1. Tworzymy "Macierz" (Grid) - symulacja pola 10x10 metrów
-# --- ZAPAMIĘTYWANIE MAPY (Session State) ---
-# Sprawdzamy, czy w "schowku" (session_state) jest już mapa o nazwie 'my_field'
-if 'my_field' not in st.session_state:
-    # Jeśli nie ma, to losujemy RAZ i zapisujemy do schowka
-    st.session_state['my_field'] = np.random.uniform(0.0, 1.0, (10, 10))
+st.markdown("---")
+st.subheader("🛰️ Dane Satelitarne (Symulacja lub Własne)")
 
-# Teraz wyciągamy mapę ze schowka do naszej zmiennej
-field_map = st.session_state['my_field']
+# 1. Widget do wgrywania plików (dajemy go na górze tej sekcji)
+uploaded_file = st.file_uploader("Masz własną mapę? Wgraj plik .txt z macierzą!", type=["txt", "csv"])
 
-# Dodatkowy przycisk, żeby wymusić zmianę pola (gdybyśmy chcieli)
-if st.button("🔄 Wylosuj nowe pole"):
-    st.session_state['my_field'] = np.random.uniform(0.0, 1.0, (10, 10))
-    st.rerun() # Odśwież stronę natychmiast
-st.write("Tak komputer widzi Twoją mapę (surowe dane):")
-st.write(field_map)
+# 2. LOGIKA STERUJĄCA (Mózg wyboru źródła danych)
+if uploaded_file is not None:
+    # SCENARIUSZ A: Użytkownik wgrał plik
+    st.info("📂 Wczytano plik użytkownika.")
+    # np.loadtxt czyta liczby z pliku tekstowego i robi z nich macierz
+    field_map = np.loadtxt(uploaded_file)
+    
+else:
+    # SCENARIUSZ B: Brak pliku -> Używamy Symulacji (to co robiliśmy wcześniej)
+    
+    # Obsługa pamięci (Session State)
+    if 'my_field' not in st.session_state:
+        st.session_state['my_field'] = np.random.uniform(0.0, 1.0, (10, 10))
+    
+    field_map = st.session_state['my_field']
+    
+    if st.button("🔄 Wylosuj nowe pole demo"):
+        st.session_state['my_field'] = np.random.uniform(0.0, 1.0, (10, 10))
+        st.rerun()
+
+# --- KONIEC LOGIKI WYBORU ---
+# Od tego momentu zmienna 'field_map' zawiera albo dane z pliku, albo losowe.
+# Reszta kodu (wykresy, suwaki) zadziała automatycznie!
 
 # 2. Wizualizacja (Jak to widzi człowiek)
 st.write("A tak widzi to agronom (Heatmapa):")
