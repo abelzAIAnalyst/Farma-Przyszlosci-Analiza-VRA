@@ -173,7 +173,13 @@ st.pyplot(fig)
 st.subheader("📉 Analiza Stref Problemowych (Maskowanie)")
 
 # 1. Definiujemy próg (Co uważamy za słabe zboże?)
-threshold = 0.4
+st.markdown("---")
+st.subheader("🎛️ Panel Decyzyjny Agronoma")
+
+# Zamiast sztywnej liczby, dajemy suwak
+threshold = st.slider("Ustaw próg NDVI (Co uznajemy za strefę słabą?)", 0.0, 1.0, 0.4, step=0.05)
+
+st.write(f"Aktualny próg odcięcia: **{threshold}**")
 
 # 2. MASKOWANIE (To jest ta magia NumPy)
 # Pytamy: "Które piksele są mniejsze od 0.4?"
