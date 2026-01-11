@@ -145,9 +145,6 @@ for pixel in ndvi_samples:
 st.success(f"Znaleziono {len(healthy_plants)} zdrowych punktów: {healthy_plants}")
 st.error(f"Znaleziono {len(weak_plants)} słabych punktów: {weak_plants}")
 
-st.markdown("---")
-st.header("🛰️ Generowanie Mapy Satelitarnej (NumPy)")
-
 # 1. Tworzymy "Macierz" (Grid) - symulacja pola 10x10 metrów
 st.markdown("---")
 st.subheader("🛰️ Dane Satelitarne (Symulacja lub Własne)")
